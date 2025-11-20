@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guo-Wen LI - Portfolio</title>
+    <style>
+        /* --- 核心变量 --- */
+        :root {
+            --bg-color: #f5f5f7;
+            --card-bg: #ffffff;
+            --text-main: #1d1d1f;
+            --text-sec: #86868b;
+            --accent: #0071e3; /* Apple Blue */
+            --accent-hover: #0077ed;
+            --orange: #f56300;
+            --radius: 24px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.12);
+            --transition: cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- 1. 左上角专属 Logo --- */
+        .brand-logo {
+            position: fixed;
+            top: 24px;
+            left: 30px;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .brand-logo:hover {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: saturate(180%) blur(20px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transform: scale(1.02);
+        }
+
+        /* CSS 绘制的 Logo 图标 */
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent);
+            border-radius: 10px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 113, 227, 0.3);
+        }
+
+        /* 内部白色圆环 (闭环/镜头) */
+        .logo-icon::before {
+            content: ''; position: absolute; width: 20px; height: 20px;
+            border: 2px solid rgba(255,255,255,0.9); border-radius: 50%;
+        }
+        /* 内部核心点 (目标/聚焦点) */
+        .logo-icon::after {
+            content: ''; position: absolute; width: 8px; height: 8px;
+            background: #fff; border-radius: 50%;
+            box-shadow: 0 0 6px rgba(255,255,255,0.8);
+        }
+
+        .logo-text { display: flex; flex-direction: column; line-height: 1; }
+        .logo-name { font-size: 16px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
+        .logo-major { 
+            font-size: 10px; font-weight: 600; color: var(--text-sec); 
+            text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; 
+        }
+
+        /* --- 2. 导航栏 --- */
+        .sticky-nav {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            pointer-events: none; /* 让两边不遮挡点击 */
+        }
+
+        .nav-pill {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            padding: 6px;
+            border-radius: 99px;
+            display: flex;
+            gap: 4px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .nav-item {
+            color: var(--text-main);
+            padding: 8px 20px;
+            border-radius: 99px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+
+        .nav-item.active { background: #fff; opacity: 1; box-shadow: var(--shadow-sm); }
+        .nav-item:hover { opacity: 1; }
+
+        .container { max-width: 1080px; margin: 0 auto; padding: 0 20px 80px 20px; }
+
+        /* --- 3. Bento 网格布局 --- */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-auto-rows: minmax(180px, auto);
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.4s var(--transition), box-shadow 0.4s var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover { transform: scale(1.02); box-shadow: var(--shadow-md); z-index: 2; }
+
+        /* 交互提示箭头 */
+        .card::after {
+            content: '↗'; position: absolute; top: 20px; right: 20px;
+            font-size: 18px; color: var(--text-sec); opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .card:hover::after { opacity: 1; transform: translate(2px, -2px); }
+
+        /* 网格尺寸 */
+        .col-span-12 { grid-column: span 12; }
+        .col-span-8 { grid-column: span 8; }
+        .col-span-6 { grid-column: span 6; }
+        .col-span-4 { grid-column: span 4; }
+        .row-span-2 { grid-row: span 2; }
+
+        /* Hero Card Style */
+        .hero-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f2ff 100%);
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        .hero-img-container {
+            width: 180px; height: 180px; flex-shrink: 0;
+            border-radius: 50%; overflow: hidden;
+            box-shadow: var(--shadow-md); border: 4px solid #fff;
+        }
+        .hero-img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-content h1 { font-size: 42px; font-weight: 700; letter-spacing: -1px; margin-bottom: 10px; }
+        .hero-tag { 
+            display: inline-block; padding: 6px 12px; 
+            background: rgba(0,113,227,0.1); color: var(--accent); 
+            border-radius: 8px; font-size: 12px; font-weight: 700; 
+            margin-bottom: 15px; text-transform: uppercase;
+        }
+        .hero-stats { display: flex; gap: 30px; margin-top: 20px; }
+        .stat-box div:first-child { font-size: 24px; font-weight: 700; color: var(--text-main); }
+        .stat-box div:last-child { font-size: 13px; color: var(--text-sec); }
+
+        /* Project & Content Style */
+        .project-badge {
+            font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text-sec); margin-bottom: 10px; display: block;
+        }
+        .highlight-badge { color: var(--orange); }
+        .card h3 { font-size: 22px; font-weight: 600; margin-bottom: 10px; line-height: 1.3; }
+        .card p { font-size: 15px; color: var(--text-sec); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .honor-row {
+            display: flex; justify-content: space-between; align-items: baseline;
+            padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .honor-row:last-child { border: none; }
+        .honor-title { font-size: 14px; font-weight: 500; }
+        .honor-year { font-size: 12px; color: var(--text-sec); font-feature-settings: "tnum"; }
+
+        .skill-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+        .skill-tag { 
+            font-size: 12px; padding: 4px 10px; border-radius: 6px; 
+            background: #f5f5f7; color: var(--text-sec); font-weight: 500;
+        }
+
+        /* --- 4. 详情页弹窗 (Modal) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            z-index: 1000; opacity: 0; pointer-events: none;
+            transition: opacity 0.4s ease;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .modal-content {
+            width: 90%; max-width: 700px; max-height: 85vh;
+            background: #fff; border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.95) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto; padding: 40px; position: relative;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+
+        .close-btn {
+            position: sticky; top: 0; float: right;
+            background: rgba(240,240,245,0.8); width: 32px; height: 32px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; font-weight: bold; color: #555; z-index: 10; margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .close-btn:hover { background: #e5e5ea; }
+
+        .modal-body h2 { font-size: 28px; margin-bottom: 8px; }
+        .modal-meta { font-size: 14px; color: var(--accent); margin-bottom: 30px; font-weight: 600; }
+        .modal-text h4 { margin: 25px 0 10px 0; font-size: 16px; color: #000; }
+        .modal-text p { margin-bottom: 10px; color: #333; font-size: 16px; text-align: justify; }
+        .modal-text ul { padding-left: 20px; margin-bottom: 15px; }
+        .modal-text li { margin-bottom: 6px; color: #444; }
+
+        /* --- 移动端适配 --- */
+        @media (max-width: 768px) {
+            .bento-grid { display: flex; flex-direction: column; }
+            .hero-card { flex-direction: column; text-align: center; padding: 40px 20px; }
+            .hero-stats { justify-content: center; }
+            .brand-logo { top: 15px; left: 15px; padding: 5px; }
+            .logo-text { display: none; } /* 手机上只保留图标，更简洁 */
+            .nav-item { padding: 6px 15px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 左上角 Logo -->
+    <a href="#" class="brand-logo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <div class="logo-icon"></div>
+        <div class="logo-text">
+            <span class="logo-name">Guo-Wen LI</span> 
+            <span class="logo-major">Automation</span>
+        </div>
+    </a>
+
+    <!-- 顶部悬浮导航 -->
+    <div class="sticky-nav">
+        <div class="nav-pill">
+            <div class="nav-item active" onclick="filterGrid('all')">全部</div>
+            <div class="nav-item" onclick="filterGrid('project')">科研</div>
+            <div class="nav-item" onclick="filterGrid('edu')">教育</div>
+            <div class="nav-item" onclick="filterGrid('honor')">荣誉</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="bento-grid">
+            
+            <!-- 1. 个人主页 Hero -->
+            <div class="card col-span-12 hero-card" onclick="openModal('profile')">
+                <div class="hero-img-container">
+                    <img src="avatar.png" alt="Guo-Wen LI" class="hero-img">
+                </div>
+                <div class="hero-content">
+                    <span class="hero-tag">PhD Candidate @ ZJU</span>
+                    <h1>Hello, I'm Guo-Wen.<br>Focus on Vision & Control.</h1>
+                    <p style="font-size: 18px; color: var(--text-sec); max-width: 600px;">
+                        杭电自动化推免至浙江大学控制学院。<br>致力于解决非视域成像、多智能体协同与复杂场景感知难题。
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat-box"><div>Top 2%</div><div>专业排名</div></div>
+                        <div class="stat-box"><div>2/97</div><div>Ranking</div></div>
+                        <div class="stat-box"><div>3篇</div><div>学术论文</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 项目：非视域成像 -->
+            <div class="card col-span-8 row-span-2" onclick="openModal('project1')">
+                <span class="project-badge highlight-badge">Optics Letters (Under Review)</span>
+                <h3>非视域目标分类：<br>场景信息编码与可学习小波</h3>
+                <p>针对目标拓扑解析难题，提出场景信息编码算子与三级级联可学习小波变换。分类准确率提升 41.8%。</p>
+                <div class="skill-grid" style="margin-top: 20px;">
+                    <span class="skill-tag">Scene Encoding</span>
+                    <span class="skill-tag">Wavelet Transform</span>
+                    <span class="skill-tag">Feature Decoupling</span>
+                </div>
+            </div>
+
+            <!-- 3. 教育背景 -->
+            <div class="card col-span-4" onclick="openModal('edu')">
+                <span class="project-badge" style="color: var(--accent)">Education</span>
+                <h3>核心课程 Grade</h3>
+                <div style="margin-top: 15px;">
+                    <div class="honor-row"><span class="honor-title">图像处理</span><span class="honor-title" style="color: var(--accent)">100</span></div>
+                    <div class="honor-row"><span class="honor-title">工程复变函数</span><span class="honor-title" style="color: var(--accent)">98</span></div>
+                    <div class="honor-row"><span class="honor-title">高等数学</span><span class="honor-title" style="color: var(--accent)">98</span></div>
+                    <div class="honor-row"><span class="honor-title">自动控制原理</span><span class="honor-title" style="color: var(--accent)">95</span></div>
+                </div>
+            </div>
+
+            <!-- 4. 荣誉奖项 -->
+            <div class="card col-span-4" onclick="openModal('honor')">
+                <span class="project-badge" style="color: #d2691e;">Top Honors</span>
+                <h3>竞赛与奖学金</h3>
+                <div style="margin-top: 10px;">
+                    <div class="honor-row"><span class="honor-title">智能车竞赛 国一</span><span class="honor-year">2024</span></div>
+                    <div class="honor-row"><span class="honor-title">ICT创新大赛 国二</span><span class="honor-year">2024</span></div>
+                    <div class="honor-row"><span class="honor-title">省政府奖学金</span><span class="honor-year">2x</span></div>
+                </div>
+            </div>
+
+            <!-- 5. 项目：智能车 -->
+            <div class="card col-span-6" onclick="openModal('project2')">
+                <span class="project-badge">全国一等奖</span>
+                <h3>智能汽车竞赛 (ROS组)</h3>
+                <p>基于华为昇腾 Atlas 200I DK。集成雷达建图、摄像头巡线、目标识别与 PID 闭环控制。</p>
+                <div class="skill-grid">
+                    <span class="skill-tag">ROS</span>
+                    <span class="skill-tag">YOLOv5s</span>
+                    <span class="skill-tag">Ascend Atlas</span>
+                </div>
+            </div>
+
+            <!-- 6. 项目：无人机 -->
+            <div class="card col-span-6" onclick="openModal('project3')">
+                <span class="project-badge">IEEE ITAIC 2025</span>
+                <h3>多无人机协同追逃博弈</h3>
+                <p>基于顺序凸规划 (SCP) 的轨迹规划算法。将非凸博弈转化为凸优化子问题，规划速度提升7倍。</p>
+                <div class="skill-grid">
+                    <span class="skill-tag">Convex Optimization</span>
+                    <span class="skill-tag">Matlab</span>
+                    <span class="skill-tag">Path Planning</span>
+                </div>
+            </div>
+
+            <!-- 7. 项目：信号灯检测 -->
+            <div class="card col-span-12" onclick="openModal('project4')">
+                <span class="project-badge">IEEE ICECAI 2025</span>
+                <h3>CadenceNet: 恶劣天气信号灯检测</h3>
+                <p>解决“看不清、看不懂”难题。引入可学习视觉原型与几何细节增强，mAP 提升 3.1%。</p>
+                <div class="skill-grid">
+                    <span class="skill-tag">Computer Vision</span>
+                    <span class="skill-tag">Semantic Context</span>
+                    <span class="skill-tag">Collaborative Learning</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 详情页弹窗 -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal-content" id="modalContent">
+            <div class="close-btn" onclick="toggleModal(false)">×</div>
+            <div id="dynamicContent" class="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        /* --- 数据源 --- */
+        const contentData = {
+            'profile': {
+                title: "Guo-Wen LI (李国文)",
+                meta: "Zhejiang University PhD Candidate",
+                body: `
+                    <h4>基本信息</h4>
+                    <p>杭州电子科技大学自动化专业，前六学期排名 2/97 (2.06%)。已推免至浙江大学控制学院攻读博士学位。CET-6 通过。</p>
+                    <h4>综合能力</h4>
+                    <p>具有扎实的专业基础与工程落地能力。曾任自动化二班班长、新生班助及院科协追光空间站部长。熟练掌握 Python, C/C++, Matlab, ROS 及深度学习框架。</p>
+                    <h4>所获奖学金</h4>
+                    <ul>
+                        <li>省政府奖学金 (2023, 2024共两次)</li>
+                        <li>校一、二等奖学金 (2022, 2024, 2025共5次)</li>
+                    </ul>
+                `
+            },
+            'edu': {
+                title: "教育背景与核心课程",
+                meta: "Core Curriculum & Skills",
+                body: `
+                    <h4>高分核心课程</h4>
+                    <ul>
+                        <li><strong>图像处理:</strong> 100分 (满绩)</li>
+                        <li><strong>工程复变函数:</strong> 98分</li>
+                        <li><strong>高等数学:</strong> 98分</li>
+                        <li><strong>自动控制原理:</strong> 95分</li>
+                        <li><strong>C语言程序设计:</strong> 93分</li>
+                    </ul>
+                    <h4>荣誉称号</h4>
+                    <p>校优秀学生干部 (2023)、军训先进个人 (2022)、院十佳大学生 (2025)、院科创之星 (2024)。</p>
+                `
+            },
+            'honor': {
+                title: "荣誉与竞赛获奖",
+                meta: "Awards & Recognition",
+                body: `
+                    <h4>国家级奖项</h4>
+                    <ul>
+                        <li>2024 第十九届全国大学生智能汽车竞赛 - <strong>全国一等奖</strong></li>
+                        <li>2024 首届高校ICT产教融合创新大赛 - <strong>全国二等奖</strong></li>
+                        <li>2023 “蓝桥杯”MWORKS复杂系统数字仿真 - <strong>全国二等奖</strong></li>
+                        <li>2024 “长三角”数学建模大赛 - 全国三等奖</li>
+                    </ul>
+                    <h4>省级奖项</h4>
+                    <ul>
+                        <li>2024 高教社杯全国大学生数学建模竞赛 (国赛) - 浙江省一等奖</li>
+                        <li>2024 智能汽车竞赛创意组 - 浙江省二等奖</li>
+                    </ul>
+                `
+            },
+            'project1': {
+                title: "非视域目标分类：场景信息编码与可学习小波",
+                meta: "Optics Letters (JCR Q2, Under Review, Co-First Author)",
+                body: `
+                    <h4>项目背景</h4>
+                    <p>非视距成像中存在维度坍缩导致目标拓扑难以解析的问题，且传统方法易受频域伪影干扰。</p>
+                    <h4>创新方法</h4>
+                    <ul>
+                        <li><strong>场景信息编码算子：</strong>融合视角校正与菲涅耳衍射机制，重构目标拓扑。</li>
+                        <li><strong>三级级联可学习小波变换：</strong>自适应解耦频域伪影与真实纹理，并结合CBAM与SE注意力机制进行特征筛选。</li>
+                    </ul>
+                    <h4>承担任务</h4>
+                    <p>基于场景编码算子优化求解算法；设计频谱解耦网络与注意力模块；撰写论文。</p>
+                    <h4>实验结果</h4>
+                    <p>在自建数据集上 Accuracy 达 71.7%，较传统分类模型提升 41.8%。</p>
+                `
+            },
+            'project2': {
+                title: "第十九届全国大学生智能汽车竞赛 (室外ROS组)",
+                meta: "National First Prize",
+                body: `
+                    <h4>系统架构</h4>
+                    <p>使用华为昇腾 Atlas 200I DK 作为核心上位机，整合激光雷达、摄像头及底层驱动。</p>
+                    <h4>核心工作</h4>
+                    <ul>
+                        <li><strong>控制算法：</strong>编写 Python 上位机代码，基于 PID 算法实现速度环和方向环的精准闭环控制。</li>
+                        <li><strong>视觉感知：</strong>基于 YOLOv5s 训练并部署目标检测模型，使用昇腾工具链进行离线量化加速。</li>
+                        <li><strong>系统集成：</strong>基于 ROS 框架，利用话题通信机制实现雷达建图、导航、识别与控制模块的数据交互。</li>
+                    </ul>
+                `
+            },
+            'project3': {
+                title: "基于顺序凸规划的多无人机协同追逃博弈",
+                meta: "IEEE ITAIC 2025 (First Author)",
+                body: `
+                    <h4>项目内容</h4>
+                    <p>针对多无人机追逃博弈中的非凸轨迹规划问题，提出基于顺序凸规划（SCP）的高效求解算法。</p>
+                    <h4>承担任务</h4>
+                    <ul>
+                        <li>负责追逃博弈问题建模及动力学约束推导。</li>
+                        <li>设计避障、防捕获约束的线性化与凸化策略。</li>
+                        <li>基于 Matlab 完成仿真验证与性能分析。</li>
+                    </ul>
+                    <h4>成果</h4>
+                    <p>算法在 6.32秒内完成逃逸轨迹规划，相比传统非线性优化算法（47.43秒）效率显著提升，且全程满足最小安全距离约束。</p>
+                `
+            },
+            'project4': {
+                title: "CadenceNet: 信号灯检测协同增强",
+                meta: "IEEE ICECAI 2025 (First Author)",
+                body: `
+                    <h4>问题痛点</h4>
+                    <p>解决恶劣天气下信号灯识别“看不清”（边缘模糊）和“看不懂”（语义缺失）的难题。</p>
+                    <h4>解决方案</h4>
+                    <ul>
+                        <li><strong>几何细节增强：</strong>通过高通滤波搭配卷积显式增强目标边缘。</li>
+                        <li><strong>情景语义协同：</strong>引入可学习的视觉原型，通过软匹配理解全局场景（如雨天），自适应加权聚焦关键通道。</li>
+                    </ul>
+                    <h4>成果</h4>
+                    <p>在 Overlook 基线上将 mAP 提升了 3.1%，并获得首届高校ICT产教融合大赛国家二等奖。</p>
+                `
+            }
+        };
+
+        /* --- 逻辑控制 --- */
+        const modalOverlay = document.getElementById('modalOverlay');
+        const dynamicContent = document.getElementById('dynamicContent');
+
+        function openModal(id) {
+            const data = contentData[id];
+            if (!data) return;
+            dynamicContent.innerHTML = `<h2>${data.title}</h2><div class="modal-meta">${data.meta}</div><div class="modal-text">${data.body}</div>`;
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(event) {
+            if (event.target === modalOverlay) toggleModal(false);
+        }
+
+        function toggleModal(show) {
+            if (show) {
+                modalOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function filterGrid(category) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.card').forEach(card => {
+                if(category === 'all' || card.getAttribute('onclick').includes(category)) {
+                    card.style.opacity = '1'; card.style.transform = 'scale(1)';
+                } else {
+                    card.style.opacity = '0.3'; card.style.transform = 'scale(0.95)';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
